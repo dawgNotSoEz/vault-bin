@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Settings, Save, Upload, Share2, Eye, EyeOff, Clock, Trash2, CheckCircle, AlertTriangle, Copy, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPaste, saveDraft } from '../lib/api';
-import { copyToClipboard, shortId, cn } from '../lib/utils';
+import { copyToClipboard, shortId } from '../lib/utils';
+import { cn } from '../lib/utils';
 
 // Simple components inline for this demo
 const Button = ({ children, variant = 'primary', size = 'md', loading, disabled, className, ...props }) => {
