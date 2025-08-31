@@ -1,7 +1,7 @@
 {
-  "name": "vault-bin",
+  "name": "vaultbin",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,6 +14,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^10.16.1",
     "lucide-react": "^0.263.1",
+    "prismjs": "^1.30.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.6.0",

@@ -7,14 +7,17 @@ export async function createPaste(payload) {
   // Simulate network latency
   await new Promise(resolve => setTimeout(resolve, 400));
   
+  const pasteId = crypto.randomUUID().split('-')[0];
   const paste = {
-    id: crypto.randomUUID(),
+    id: pasteId,
     ...payload,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     views: 0,
-    url: `https://vaultbin.dev/${crypto.randomUUID().split('-')[0]}`,
-    status: 'active'
+    url: `https://vaultbin.dev/${pasteId}`,
+    status: "ready",
+    protection: payload.visibility === "private" ? "Password / Link" : "Link Access",
+    expiresIn: payload.expires?.type === "permanent" ? "Never" : "1 day",
   };
   
   // Simulate success/error based on content
@@ -30,7 +33,7 @@ export async function createPaste(payload) {
  */
 export async function saveDraft(payload) {
   // Simulate shorter latency for drafts
-  await new Promise(resolve => setTimeout(resolve, 200));
+  await new Promise(resolve => setTimeout(resolve, 250));
   
   const draft = {
     id: payload.id ?? crypto.randomUUID(),
