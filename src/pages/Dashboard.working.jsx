@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, List, Grid, Filter, Lock, Globe, EyeOff, Calendar, User } from 'lucide-react'
+import { Plus, List, LayoutGrid, Filter, Lock, Globe, EyeOff, Calendar, User } from 'lucide-react'
 
 function Dashboard() {
   const [viewMode, setViewMode] = useState('list')
@@ -166,7 +166,7 @@ function Dashboard() {
                 : 'bg-zinc-800 text-zinc-400 hover:text-white'
             }`}
           >
-            <Grid className="w-4 h-4" />
+            <LayoutGrid className="w-4 h-4" />
           </button>
         </div>
       </div>

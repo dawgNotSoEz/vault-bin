@@ -1,5 +1,5 @@
 import React from 'react'
-import { Shield, Github, Twitter } from 'lucide-react'
+import { Shield, GitHub, Twitter } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { features, security } from '../lib/data.js'
 import Card from '../components/Card.jsx'
@@ -116,7 +116,7 @@ function AboutFeatures() {
         <Card className="text-center group hover:scale-105 transition-all duration-300" variant="glass">
           <div className="space-y-4">
             <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-purple-500/25 transition-all duration-300">
-              <Github className="w-8 h-8 text-white" />
+              <GitHub className="w-8 h-8 text-white" />
             </div>
             <div>
               <h3 className="font-semibold text-white mb-3 group-hover:text-purple-300 transition-colors">Open Source</h3>
