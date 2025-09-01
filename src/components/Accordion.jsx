@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
-const Accordion = ({ 
-  children, 
+const Accordion = ({
+  children,
   type = 'single', // 'single' or 'multiple'
-  className 
+  className
 }) => {
   const [openItems, setOpenItems] = useState(new Set());
 
@@ -25,8 +25,8 @@ const Accordion = ({
 
   return (
     <div className={cn('space-y-2', className)}>
-      {React.Children.map(children, (child) => 
-        React.cloneElement(child, { 
+      {React.Children.map(children, (child) =>
+        React.cloneElement(child, {
           isOpen: openItems.has(child.props.value),
           onToggle: () => toggleItem(child.props.value)
         })
@@ -35,13 +35,13 @@ const Accordion = ({
   );
 };
 
-const AccordionItem = ({ 
-  value, 
-  title, 
-  children, 
-  isOpen = false, 
+const AccordionItem = ({
+  value,
+  title,
+  children,
+  isOpen = false,
   onToggle,
-  className 
+  className
 }) => {
   return (
     <div className={cn('border border-zinc-800 rounded-xl overflow-hidden', className)}>

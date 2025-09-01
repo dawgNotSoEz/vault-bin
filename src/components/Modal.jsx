@@ -1,96 +1,84 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 
-const Modal = ({ 
-  open, 
-  onClose, 
-  children, 
+const Modal = ({
+  isOpen,
+  onClose,
+  title,
+  children,
   className,
-  closeOnBackdrop = true 
+  size = 'md',
+  ...props
 }) => {
-  React.useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose();
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        onClose?.();
+      }
     };
 
-    if (open) {
+    if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
+    } else {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     };
-  }, [open, onClose]);
+  }, [isOpen, onClose]);
 
-  return (
-    <AnimatePresence>
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={closeOnBackdrop ? onClose : undefined}
-          />
-          
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 30, stiffness: 400 }}
-            className={cn(
-              'relative w-full max-w-lg max-h-[90vh] overflow-hidden',
-              'bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl',
-              'focus:outline-none',
-              className
-            )}
-            role="dialog"
-            aria-modal="true"
+  if (!isOpen) return null;
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      tabIndex="-1"
+      ref={modalRef}
+      {...props}
+    >
+      <div
+        className={cn(
+          'relative bg-zinc-900 border border-zinc-800 rounded-2xl shadow-xl flex flex-col',
+          'max-h-[90vh] overflow-hidden',
+          size === 'sm' && 'w-full max-w-sm',
+          size === 'md' && 'w-full max-w-md',
+          size === 'lg' && 'w-full max-w-lg',
+          size === 'xl' && 'w-full max-w-xl',
+          size === 'full' && 'w-full max-w-3xl',
+          className
+        )}
+        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+      >
+        <div className="flex items-center justify-between p-6 border-b border-zinc-800">
+          <h3 id="modal-title" className="text-xl font-semibold text-white">
+            {title}
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
+            aria-label="Close modal"
           >
-            {children}
-          </motion.div>
+            <X className="w-5 h-5" />
+          </button>
         </div>
-      )}
-    </AnimatePresence>
+        <div className="p-6 overflow-y-auto flex-1">
+          {children}
+        </div>
+      </div>
+    </div>,
+    document.body
   );
 };
-
-const ModalHeader = ({ children, onClose, className }) => (
-  <div className={cn('flex items-center justify-between p-6 border-b border-zinc-800', className)}>
-    {children}
-    {onClose && (
-      <button
-        onClick={onClose}
-        className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
-        aria-label="Close modal"
-      >
-        <X size={20} className="text-zinc-400" />
-      </button>
-    )}
-  </div>
-);
-
-const ModalContent = ({ children, className }) => (
-  <div className={cn('p-6', className)}>
-    {children}
-  </div>
-);
-
-const ModalFooter = ({ children, className }) => (
-  <div className={cn('flex items-center justify-end gap-3 p-6 border-t border-zinc-800', className)}>
-    {children}
-  </div>
-);
-
-Modal.Header = ModalHeader;
-Modal.Content = ModalContent;
-Modal.Footer = ModalFooter;
 
 export default Modal;

@@ -1,181 +1,99 @@
-import React, { useState, useRef } from 'react';
-import { Upload, X, File } from 'lucide-react';
-import { allowedFileTypes, maxFileSize, maxTotalSize } from '../lib/data';
-import { formatBytes, cn } from '../lib/utils';
+import React, { useCallback, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { UploadCloud, FileText, X } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
-const AttachmentDropzone = ({ 
-  value = [], 
-  onChange, 
-  error,
+const AttachmentDropzone = ({
+  onFilesChange,
+  maxSize = 10 * 1024 * 1024, // 10MB
+  maxFiles = 5,
   className,
-  ...props 
+  ...props
 }) => {
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [uploadError, setUploadError] = useState('');
-  const fileInputRef = useRef();
-  
-  const totalSize = value.reduce((sum, file) => sum + file.size, 0);
-  
-  const validateFile = (file) => {
-    const extension = '.' + file.name.split('.').pop().toLowerCase();
-    
-    if (!allowedFileTypes.includes(extension)) {
-      return `File type ${extension} not allowed`;
-    }
-    
-    if (file.size > maxFileSize) {
-      return `File size exceeds ${formatBytes(maxFileSize)} limit`;
-    }
-    
-    if (totalSize + file.size > maxTotalSize) {
-      return `Total size would exceed ${formatBytes(maxTotalSize)} limit`;
-    }
-    
-    return null;
+  const [files, setFiles] = useState([]);
+  const [error, setError] = useState(null);
+
+  const onDrop = useCallback(acceptedFiles => {
+    setError(null);
+    const newFiles = acceptedFiles.map(file => Object.assign(file, {
+      preview: URL.createObjectURL(file)
+    }));
+
+    const updatedFiles = [...files, ...newFiles].slice(0, maxFiles);
+    setFiles(updatedFiles);
+    onFilesChange?.(updatedFiles);
+  }, [files, maxFiles, onFilesChange]);
+
+  const { getRootProps, getInputProps, isDragActive, fileRejections } = useDropzone({
+    onDrop,
+    maxSize,
+    maxFiles,
+    noClick: false,
+    noKeyboard: false,
+  });
+
+  const removeFile = (fileName) => {
+    const updatedFiles = files.filter(file => file.name !== fileName);
+    setFiles(updatedFiles);
+    onFilesChange?.(updatedFiles);
   };
-  
-  const addFiles = (newFiles) => {
-    const validFiles = [];
-    let errorMsg = '';
-    
-    for (const file of newFiles) {
-      const error = validateFile(file);
-      if (error) {
-        errorMsg = error;
-        break;
+
+  useEffect(() => {
+    if (fileRejections.length > 0) {
+      const rejection = fileRejections[0];
+      if (rejection.errors[0].code === 'file-too-large') {
+        setError(`File is too large. Max size is ${maxSize / (1024 * 1024)}MB.`);
+      } else if (rejection.errors[0].code === 'too-many-files') {
+        setError(`Too many files. Max files is ${maxFiles}.`);
+      } else {
+        setError('File rejected. Please try again.');
       }
-      validFiles.push({
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        file: file // Store the actual file object for upload
-      });
     }
-    
-    if (errorMsg) {
-      setUploadError(errorMsg);
-      return;
-    }
-    
-    onChange([...value, ...validFiles]);
-    setUploadError('');
-  };
-  
-  const removeFile = (index) => {
-    onChange(value.filter((_, i) => i !== index));
-    setUploadError('');
-  };
-  
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-  
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-  
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    addFiles(files);
-  };
-  
-  const handleFileSelect = (e) => {
-    const files = Array.from(e.target.files);
-    addFiles(files);
-    // Reset input to allow selecting the same file again
-    e.target.value = '';
-  };
-  
+  }, [fileRejections, maxSize, maxFiles]);
+
   return (
     <div className={cn('space-y-4', className)} {...props}>
       <div
+        {...getRootProps()}
         className={cn(
-          'border-2 border-dashed rounded-xl p-6 text-center transition-colors duration-200 cursor-pointer',
-          isDragOver
-            ? 'border-indigo-500 bg-indigo-500/10'
-            : 'border-zinc-700 hover:border-zinc-600 bg-zinc-900/30'
+          'flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl transition-colors duration-200',
+          'cursor-pointer',
+          isDragActive ? 'border-purple-500 bg-purple-500/10' : 'border-zinc-700 bg-zinc-800/50',
+          error ? 'border-red-500' : '',
         )}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
       >
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept={allowedFileTypes.join(',')}
-          onChange={handleFileSelect}
-          className="hidden"
-          aria-label="Select files to attach"
-        />
-        
-        <Upload className="h-8 w-8 text-zinc-400 mx-auto mb-3" />
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-zinc-300">
-            Drop files here or click to browse
-          </p>
-          <p className="text-xs text-zinc-500">
-            Max {formatBytes(maxFileSize)} per file, {formatBytes(maxTotalSize)} total
-          </p>
-        </div>
+        <input {...getInputProps()} />
+        <UploadCloud className="w-10 h-10 text-zinc-400 mb-3" />
+        <p className="text-zinc-300 text-center mb-1">
+          {isDragActive ? 'Drop the files here ...' : 'Drag & drop files here, or click to select'}
+        </p>
+        <p className="text-zinc-500 text-sm">Max {maxSize / (1024 * 1024)}MB per file, up to {maxFiles} files</p>
+        {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
       </div>
-      
-      {value.length > 0 && (
+
+      {files.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-zinc-300">
-            Attached Files ({value.length})
-          </h4>
-          <div className="space-y-2">
-            {value.map((file, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 bg-zinc-900/60 border border-zinc-800 rounded-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <File className="h-4 w-4 text-zinc-400" />
-                  <div>
-                    <p className="text-sm text-zinc-300 truncate max-w-48">
-                      {file.name}
-                    </p>
-                    <p className="text-xs text-zinc-500">
-                      {formatBytes(file.size)}
-                    </p>
-                  </div>
+          <h3 className="text-zinc-300 text-sm font-medium">Attached Files:</h3>
+          <ul className="space-y-2">
+            {files.map(file => (
+              <li key={file.name} className="flex items-center justify-between p-3 bg-zinc-800/50 border border-zinc-700 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <FileText className="w-5 h-5 text-zinc-400" />
+                  <span className="text-zinc-300 text-sm truncate">{file.name}</span>
+                  <span className="text-zinc-500 text-xs">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                 </div>
                 <button
-                  type="button"
-                  onClick={() => removeFile(index)}
-                  className="text-zinc-400 hover:text-red-400 transition-colors"
-                  aria-label={`Remove ${file.name}`}
+                  onClick={() => removeFile(file.name)}
+                  className="p-1 rounded-full text-zinc-400 hover:bg-zinc-700/50 hover:text-white transition-colors"
+                  aria-label="Remove file"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="w-4 h-4" />
                 </button>
-              </div>
+              </li>
             ))}
-          </div>
-          
-          <div className="flex justify-between text-xs text-zinc-500">
-            <span>Total: {formatBytes(totalSize)}</span>
-            <span>{formatBytes(maxTotalSize - totalSize)} remaining</span>
-          </div>
+          </ul>
         </div>
       )}
-      
-      {(uploadError || error) && (
-        <p className="text-sm text-red-400" role="alert">
-          {uploadError || error}
-        </p>
-      )}
-      
-      <div className="text-xs text-zinc-500">
-        <p>Supported formats: {allowedFileTypes.join(', ')}</p>
-      </div>
     </div>
   );
 };

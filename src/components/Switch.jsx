@@ -1,18 +1,18 @@
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 
-const Switch = ({ 
-  checked, 
-  onCheckedChange, 
+const Switch = ({
+  checked,
+  onCheckedChange,
   className,
   disabled = false,
   id,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
-  ...props 
+  ...props
 }) => {
   const switchId = id || `switch-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   return (
     <button
       id={switchId}

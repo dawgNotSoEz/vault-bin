@@ -1,77 +1,95 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
-const Drawer = ({ 
-  open, 
-  onClose, 
-  children, 
+const Drawer = ({
+  isOpen,
+  onClose,
   title,
-  className 
+  children,
+  className,
+  side = 'right',
+  ...props
 }) => {
-  React.useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose();
+  const drawerRef = useRef(null);
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        onClose?.();
+      }
     };
 
-    if (open) {
+    if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'; // Prevent scrolling behind drawer
+    } else {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     };
-  }, [open, onClose]);
+  }, [isOpen, onClose]);
 
-  return (
-    <AnimatePresence>
-      {open && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+  if (!isOpen) return null;
+
+  const sideClasses = {
+    right: 'inset-y-0 right-0 transform translate-x-full',
+    left: 'inset-y-0 left-0 transform -translate-x-full',
+    top: 'inset-x-0 top-0 transform -translate-y-full',
+    bottom: 'inset-x-0 bottom-0 transform translate-y-full',
+  };
+
+  const openClasses = {
+    right: 'translate-x-0',
+    left: 'translate-x-0',
+    top: 'translate-y-0',
+    bottom: 'translate-y-0',
+  };
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex bg-black/70 backdrop-blur-sm"
+      onClick={onClose} // Close when clicking outside drawer
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="drawer-title"
+      tabIndex="-1"
+      ref={drawerRef}
+      {...props}
+    >
+      <div
+        className={cn(
+          'absolute bg-zinc-900 border border-zinc-800 shadow-xl flex flex-col transition-transform duration-300 ease-out',
+          sideClasses[side],
+          isOpen && openClasses[side],
+          side === 'right' || side === 'left' ? 'w-80' : 'h-80', // Default width/height
+          className
+        )}
+        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside drawer
+      >
+        <div className="flex items-center justify-between p-6 border-b border-zinc-800">
+          <h3 id="drawer-title" className="text-xl font-semibold text-white">
+            {title}
+          </h3>
+          <button
             onClick={onClose}
-          />
-          
-          {/* Drawer */}
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className={cn(
-              'fixed right-0 top-0 h-full w-[380px] sm:w-[420px] lg:w-[460px]',
-              'bg-zinc-950 border-l border-zinc-800 shadow-2xl z-50',
-              'flex flex-col overflow-hidden',
-              className
-            )}
+            className="p-2 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
+            aria-label="Close drawer"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-zinc-800">
-              <h2 className="text-lg font-semibold text-zinc-100">{title}</h2>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
-                aria-label="Close drawer"
-              >
-                <X size={20} className="text-zinc-400" />
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              {children}
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-6 overflow-y-auto flex-1">
+          {children}
+        </div>
+      </div>
+    </div>,
+    document.body
   );
 };
 

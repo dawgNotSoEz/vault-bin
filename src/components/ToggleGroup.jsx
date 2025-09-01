@@ -1,46 +1,57 @@
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
-const ToggleGroup = ({ 
-  value, 
-  onValueChange, 
-  className,
+const ToggleGroup = ({
   children,
-  ...props 
+  type = 'single', // 'single' or 'multiple'
+  value,
+  onValueChange,
+  className,
+  ...props
 }) => {
+  const handleValueChange = (itemValue) => {
+    if (type === 'single') {
+      onValueChange(value === itemValue ? undefined : itemValue);
+    } else {
+      const newValue = new Set(value);
+      if (newValue.has(itemValue)) {
+        newValue.delete(itemValue);
+      } else {
+        newValue.add(itemValue);
+      }
+      onValueChange(Array.from(newValue));
+    }
+  };
+
   return (
-    <div
-      className={cn('flex', className)}
-      role="group"
-      {...props}
-    >
-      {children}
+    <div className={cn('flex bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-1', className)} {...props}>
+      {React.Children.map(children, (child) =>
+        React.cloneElement(child, {
+          isActive: type === 'single' ? value === child.props.value : value.includes(child.props.value),
+          onClick: () => handleValueChange(child.props.value),
+        })
+      )}
     </div>
   );
 };
 
-const ToggleGroupItem = ({ 
-  value, 
-  children, 
+const ToggleGroupItem = ({
+  children,
+  value,
+  isActive,
+  onClick,
   className,
-  pressed,
-  onPressedChange,
-  ...props 
+  ...props
 }) => {
   return (
     <button
       type="button"
       className={cn(
-        'px-3 py-2 text-sm font-medium transition-colors duration-200',
-        'border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-950',
-        'first:rounded-l-lg last:rounded-r-lg -ml-px first:ml-0',
-        pressed
-          ? 'bg-indigo-600 text-white border-indigo-600 z-10'
-          : 'bg-zinc-900/60 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100',
+        'flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+        isActive ? 'bg-purple-600 text-white' : 'text-zinc-300 hover:bg-zinc-700/50',
         className
       )}
-      aria-pressed={pressed}
-      onClick={() => onPressedChange(!pressed)}
+      onClick={onClick}
       {...props}
     >
       {children}

@@ -1,17 +1,17 @@
 import React, { forwardRef } from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 
-const Input = forwardRef(({ 
-  className, 
+const Input = forwardRef(({
+  className,
   type = 'text',
   label,
   error,
   required = false,
   id,
-  ...props 
+  ...props
 }, ref) => {
   const inputId = id || props.name || `input-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   return (
     <div className="space-y-2">
       {label && (

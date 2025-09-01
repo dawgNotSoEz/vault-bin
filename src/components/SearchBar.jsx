@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Search, X } from 'lucide-react'
-import { cn } from '../lib/utils'
+import { cn } from '@/lib/utils'
 
 function SearchBar({ onClose, className, value, onChange, placeholder = "Search pastes..." }) {
   const [internalQuery, setInternalQuery] = useState('')

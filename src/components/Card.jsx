@@ -1,18 +1,18 @@
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
-const Card = ({ 
-  className, 
+const Card = ({
+  className,
   variant = 'default',
-  children, 
-  ...props 
+  children,
+  ...props
 }) => {
   const variants = {
     default: 'rounded-2xl border border-zinc-800/70 bg-zinc-950/60 shadow-[0_1px_0_0_rgba(255,255,255,0.02)_inset,0_8px_24px_-12px_rgba(0,0,0,0.8)] hover:border-zinc-700/70 transition-colors duration-200',
     glass: 'rounded-2xl border border-zinc-800/50 bg-zinc-950/30 backdrop-blur-xl shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_8px_32px_-12px_rgba(0,0,0,0.6)]',
     elevated: 'rounded-2xl border border-zinc-800/70 bg-zinc-950/80 shadow-[0_4px_16px_-8px_rgba(0,0,0,0.8),0_1px_0_0_rgba(255,255,255,0.03)_inset]'
   };
-  
+
   return (
     <div
       className={cn(variants[variant], className)}

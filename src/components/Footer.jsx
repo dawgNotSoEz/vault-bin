@@ -1,5 +1,5 @@
 import React from 'react'
-import { Shield, Github, Twitter } from 'lucide-react'
+import { Shield, GitHub, Twitter } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 function Footer() {
@@ -56,7 +56,7 @@ function Footer() {
               className="text-zinc-400 hover:text-white transition-colors"
               aria-label="GitHub"
             >
-              <Github className="w-5 h-5" />
+              <GitHub className="w-5 h-5" />
             </a>
             <a
               href="https://twitter.com"
