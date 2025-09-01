@@ -1,107 +1,80 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Home, Github, Folder, Settings, Plus } from 'lucide-react'
-import { cn } from '../lib/utils'
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Shield, Home, Plus, Eye, Users, Settings, LogIn, UserPlus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-function Sidebar() {
-  const [hoveredItem, setHoveredItem] = useState(null)
+const Sidebar = () => {
+  const location = useLocation();
 
-  const sidebarItems = [
-    { icon: Home, label: 'Home', href: '/' },
-    { icon: Github, label: 'GitHub', href: 'https://github.com', external: true },
-    { icon: Folder, label: 'Folders', href: '/#folders' },
-    { icon: Settings, label: 'Settings', href: '/settings' },
-  ]
+  const navigation = [
+    { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'Create Paste', href: '/create', icon: Plus },
+    { name: 'View Demo', href: '/view-demo', icon: Eye },
+    { name: 'Collaborate', href: '/collaborate/demo', icon: Users },
+    { name: 'Settings', href: '/settings', icon: Settings },
+  ];
+
+  const authLinks = [
+    { name: 'Login', href: '/login', icon: LogIn },
+    { name: 'Sign Up', href: '/signup', icon: UserPlus },
+  ];
 
   return (
-    <aside className="fixed left-0 top-16 w-16 h-[calc(100vh-4rem)] glass-dark backdrop-blur-xl border-r border-zinc-800/50 z-40 shadow-xl">
-      <div className="flex flex-col items-center py-6 space-y-3">
-        {sidebarItems.map((item, index) => (
-          <div key={index} className="relative">
-            {item.external ? (
-              <a
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={cn(
-                  "flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-200 group",
-                  "text-zinc-400 hover:text-white hover:bg-white/10 hover:scale-110 hover:shadow-lg",
-                  "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-black",
-                  "backdrop-blur-sm border border-transparent hover:border-zinc-700/50"
-                )}
-                onMouseEnter={() => setHoveredItem(index)}
-                onMouseLeave={() => setHoveredItem(null)}
-                aria-label={item.label}
-                aria-describedby={`tooltip-${index}`}
-              >
-                <item.icon className="w-5 h-5 transition-transform group-hover:scale-110" />
-              </a>
-            ) : (
+    <div className="w-64 bg-neutral-800 border-r border-neutral-700 flex flex-col">
+      <div className="p-6">
+        <Link to="/dashboard" className="flex items-center gap-3 group">
+          <div className="p-2 bg-transparent rounded-2xl group-hover:scale-105 transition-transform">
+            <Shield className="h-8 w-8 text-purple-400" />
+          </div>
+          <span className="text-xl font-bold text-white">VaultBin</span>
+        </Link>
+      </div>
+
+      <nav className="flex-1 px-4 pb-4">
+        <div className="space-y-1">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href || 
+                           (item.href === '/dashboard' && location.pathname === '/');
+            return (
               <Link
+                key={item.name}
                 to={item.href}
                 className={cn(
-                  "flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-200 group",
-                  "text-zinc-400 hover:text-white hover:bg-white/10 hover:scale-110 hover:shadow-lg",
-                  "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-black",
-                  "backdrop-blur-sm border border-transparent hover:border-zinc-700/50"
+                  'flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 hover:scale-[1.02]',
+                  isActive
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'text-neutral-300 hover:bg-neutral-700 hover:text-white'
                 )}
-                onMouseEnter={() => setHoveredItem(index)}
-                onMouseLeave={() => setHoveredItem(null)}
-                aria-label={item.label}
-                aria-describedby={`tooltip-${index}`}
               >
-                <item.icon className="w-5 h-5 transition-transform group-hover:scale-110" />
+                <item.icon className="h-5 w-5" />
+                <span className="font-medium">{item.name}</span>
               </Link>
-            )}
-            
-            {/* Tooltip */}
-            {hoveredItem === index && (
-              <div
-                id={`tooltip-${index}`}
-                className="absolute left-16 top-1/2 -translate-y-1/2 px-3 py-2 glass-dark backdrop-blur-xl text-white text-sm rounded-lg shadow-xl border border-zinc-700/50 whitespace-nowrap z-50"
-                role="tooltip"
-              >
-                {item.label}
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-zinc-800 border-l border-t border-zinc-700/50 rotate-45 rounded-sm"></div>
-              </div>
-            )}
-          </div>
-        ))}
-
-        {/* Separator */}
-        <div className="w-8 h-px bg-zinc-700/50 my-2"></div>
-
-        {/* New Paste Button */}
-        <div className="relative">
-          <button
-            className={cn(
-              "flex items-center justify-center w-11 h-11 rounded-xl transition-all duration-200 group",
-              "bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-lg",
-              "hover:shadow-blue-500/25 hover:scale-110 hover:from-blue-500 hover:to-purple-500",
-              "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-black"
-            )}
-            onMouseEnter={() => setHoveredItem('new')}
-            onMouseLeave={() => setHoveredItem(null)}
-            aria-label="New Paste"
-            aria-describedby="tooltip-new"
-          >
-            <Plus className="w-5 h-5 transition-transform group-hover:scale-110 group-hover:rotate-90" />
-          </button>
-          
-          {hoveredItem === 'new' && (
-            <div
-              id="tooltip-new"
-              className="absolute left-16 top-1/2 -translate-y-1/2 px-3 py-2 glass-dark backdrop-blur-xl text-white text-sm rounded-lg shadow-xl border border-zinc-700/50 whitespace-nowrap z-50"
-              role="tooltip"
-            >
-              New Paste
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-zinc-800 border-l border-t border-zinc-700/50 rotate-45 rounded-sm"></div>
-            </div>
-          )}
+            );
+          })}
         </div>
-      </div>
-    </aside>
-  )
-}
 
-export default Sidebar
+        <div className="mt-8 pt-6 border-t border-neutral-700">
+          <div className="space-y-1">
+            {authLinks.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={cn(
+                  'flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 hover:scale-[1.02]',
+                  location.pathname === item.href
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'text-neutral-300 hover:bg-neutral-700 hover:text-white'
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+                <span className="font-medium">{item.name}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </nav>
+    </div>
+  );
+};
+
+export default Sidebar;
