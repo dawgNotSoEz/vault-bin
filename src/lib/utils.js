@@ -1,149 +1,24 @@
-import { clsx } from 'clsx';
+import { clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-/**
- * Utility function to merge class names conditionally
- */
 export function cn(...inputs) {
-  return clsx(inputs);
+  return twMerge(clsx(inputs))
 }
 
-/**
- * Format bytes to human readable string
- */
-export function formatBytes(bytes, decimals = 2) {
-  if (bytes === 0) return '0 Bytes';
-  
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-}
-
-/**
- * Format date to relative time or specific format
- */
-export function formatDate(date, options = {}) {
+export const formatTimeAgo = (dateString) => {
+  const date = new Date(dateString);
   const now = new Date();
-  const target = new Date(date);
-  const diffInMs = now - target;
-  const diffInHours = diffInMs / (1000 * 60 * 60);
-  
-  if (options.relative !== false && diffInHours < 24) {
-    if (diffInHours < 1) {
-      const minutes = Math.floor(diffInMs / (1000 * 60));
-      return `${minutes}m ago`;
-    }
-    return `${Math.floor(diffInHours)}h ago`;
-  }
-  
-  return target.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: target.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-  });
-}
+  const seconds = Math.round((now.getTime() - date.getTime()) / 1000);
+  const minutes = Math.round(seconds / 60);
+  const hours = Math.round(minutes / 60);
+  const days = Math.round(hours / 24);
+  const months = Math.round(days / 30.4);
+  const years = Math.round(days / 365);
 
-/**
- * Debounce function execution
- */
-export function debounce(func, wait, immediate = false) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      timeout = null;
-      if (!immediate) func(...args);
-    };
-    const callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) func(...args);
-  };
-}
-
-/**
- * Generate a random ID
- */
-export function generateId() {
-  return Math.random().toString(36).substr(2, 9);
-}
-
-export function shortId(length = 8) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
-/**
- * Validate email format
- */
-export function isValidEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/**
- * Validate tag format (alphanum + dash only)
- */
-export function isValidTag(tag) {
-  const tagRegex = /^[a-zA-Z0-9-]+$/;
-  return tagRegex.test(tag) && tag.length >= 1 && tag.length <= 24;
-}
-
-/**
- * Calculate estimated content size
- */
-export function estimateSize(content, attachments = []) {
-  const contentSize = new Blob([content]).size;
-  const attachmentSize = attachments.reduce((total, file) => total + file.size, 0);
-  return contentSize + attachmentSize;
-}
-
-/**
- * Copy text to clipboard
- */
-export async function copyToClipboard(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch (err) {
-    // Fallback for older browsers
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    textArea.style.position = 'fixed';
-    textArea.style.left = '-999999px';
-    textArea.style.top = '-999999px';
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    try {
-      document.execCommand('copy');
-      return true;
-    } catch (err) {
-      return false;
-    } finally {
-      document.body.removeChild(textArea);
-    }
-  }
-}
-
-export function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max);
-}
-
-export function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-export function getScrollProgress() {
-  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-  const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  return scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-}
+  if (seconds < 60) return `${seconds}s ago`;
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 30) return `${days}d ago`;
+  if (months < 12) return `${months}mo ago`;
+  return `${years}y ago`;
+};
