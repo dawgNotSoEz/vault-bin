@@ -19,19 +19,9 @@ const Sidebar = () => {
   const folders = demoFolders.slice(0, 6); // Show first 6 folders
 
   return (
-    <aside className="w-64 bg-neutral-800/90 backdrop-blur-sm border-r border-neutral-700/50 flex flex-col">
-      {/* Brand */}
-      <div className="p-6 border-b border-neutral-700/50">
-        <Link to="/dashboard" className="flex items-center gap-3 group">
-          <div className="p-2 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl group-hover:scale-105 transition-transform">
-            <Shield className="h-6 w-6 text-white" />
-          </div>
-          <span className="text-xl font-bold text-white">VaultBin</span>
-        </Link>
-      </div>
-
+    <aside className="w-64 bg-neutral-800/90 backdrop-blur-sm border-r border-neutral-700/50 flex flex-col min-h-screen pt-4">
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6">
+      <nav className="flex-1 px-4 py-2">
         <div className="space-y-1 mb-8">
           {navigation.map((item) => {
             const isActive = location.pathname === item.href || 
