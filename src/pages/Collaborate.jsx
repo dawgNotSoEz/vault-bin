@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, User, Send, Users, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import SyntaxHighlighter from '@/components/SyntaxHighlighter';
+import SimpleSyntaxHighlighter from '@/components/SimpleSyntaxHighlighter';
 
 const Collaborate = () => {
   const [editorContent, setEditorContent] = useState(
@@ -122,7 +122,7 @@ console.log(fibonacciMemo(10)); // 55 (faster)`
             </div>
             
             <div className="relative">
-              <SyntaxHighlighter 
+              <SimpleSyntaxHighlighter 
                 code={editorContent} 
                 language="javascript"
                 showLineNumbers={true}

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getPasteById, updatePaste, deletePaste } from '@/lib/demoData';
 import { cn, formatTimeAgo } from '@/lib/utils';
 import { Copy, Download, Share, Edit, Trash, Lock, Eye, Globe, EyeOff } from 'lucide-react';
-import SyntaxHighlighter from '@/components/SyntaxHighlighter';
+import SimpleSyntaxHighlighter from '@/components/SimpleSyntaxHighlighter';
 import Box from '@/components/Box';
 import Badge from '@/components/Badge';
 import Button from '@/components/Button';
@@ -162,7 +162,7 @@ const ViewPaste = () => {
                   <Badge variant="warning" size="sm">Burn after reading</Badge>
                 )}
               </div>
-              <SyntaxHighlighter code={paste.content} language={paste.language} />
+              <SimpleSyntaxHighlighter code={paste.content} language={paste.language} />
             </Box.Body>
           </Box>
 

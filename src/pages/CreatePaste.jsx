@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, Save, Copy, ExternalLink, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import SyntaxHighlighter from '@/components/SyntaxHighlighter';
+import SimpleSyntaxHighlighter from '@/components/SimpleSyntaxHighlighter';
 
 const CreatePaste = () => {
   const [formData, setFormData] = useState({
@@ -170,7 +170,7 @@ const CreatePaste = () => {
         {formData.content && (
           <div>
             <h3 className="text-lg font-semibold text-white mb-3">Preview</h3>
-            <SyntaxHighlighter 
+            <SimpleSyntaxHighlighter 
               code={formData.content} 
               language={formData.language}
               showCopyButton={false}

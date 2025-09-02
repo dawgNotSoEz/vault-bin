@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, Eye, Copy, Download, Share } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import SyntaxHighlighter from '@/components/SyntaxHighlighter';
+import SimpleSyntaxHighlighter from '@/components/SimpleSyntaxHighlighter';
 
 const ViewDemo = () => {
   const [password, setPassword] = useState('');
@@ -142,7 +142,7 @@ app.listen(3000, () => {
           </div>
 
           {/* Code Content */}
-          <SyntaxHighlighter 
+          <SimpleSyntaxHighlighter 
             code={demoContent} 
             language="javascript"
           />

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Grid, List, BarChart3, Clock, Folder, Globe, Lock, Eye, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { demoPastes, getStats } from '@/lib/demoData';
-import SyntaxHighlighter from '@/components/SyntaxHighlighter';
+import SimpleSyntaxHighlighter from '@/components/SimpleSyntaxHighlighter';
 
 // Paste Card Component
 const PasteCard = ({ paste, viewMode }) => {

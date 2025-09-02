@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Copy, Check, Search, ChevronUp, ChevronDown, X } from 'lucide-react';
-import Prism from 'prismjs';
 import { cn } from '@/lib/utils';
 
-// Import PrismJS components in correct order
+// Import Prism core
+import Prism from 'prismjs';
+
+// Import PrismJS components in correct dependency order
 import 'prismjs/components/prism-markup';
-import 'prismjs/components/prism-markdown';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-jsx';
@@ -13,8 +16,8 @@ import 'prismjs/components/prism-tsx';
 import 'prismjs/components/prism-python';
 import 'prismjs/components/prism-java';
 import 'prismjs/components/prism-csharp';
-import 'prismjs/components/prism-cpp';
 import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-cpp';
 import 'prismjs/components/prism-php';
 import 'prismjs/components/prism-ruby';
 import 'prismjs/components/prism-go';
@@ -22,11 +25,10 @@ import 'prismjs/components/prism-rust';
 import 'prismjs/components/prism-sql';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-yaml';
-import 'prismjs/components/prism-css';
 import 'prismjs/components/prism-scss';
 import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-powershell';
-import 'prismjs/plugins/line-numbers/prism-line-numbers';
+import 'prismjs/components/prism-markdown';
 
 const SyntaxHighlighter = ({ 
   code, 
@@ -49,15 +51,41 @@ const SyntaxHighlighter = ({
   useEffect(() => {
     if (code && language) {
       try {
-        const highlighted = Prism.highlight(
-          code,
-          Prism.languages[language] || Prism.languages.plaintext,
-          language
-        );
-        setHighlightedCode(highlighted);
+        // Ensure Prism is properly initialized
+        if (!Prism || !Prism.languages) {
+          setHighlightedCode(code);
+          return;
+        }
+
+        // Get the language grammar, fallback to plaintext
+        const grammar = Prism.languages[language] || 
+                       Prism.languages.plaintext || 
+                       Prism.languages.plain ||
+                       null;
+
+        if (grammar) {
+          const highlighted = Prism.highlight(code, grammar, language);
+          setHighlightedCode(highlighted);
+        } else {
+          // If no grammar found, just escape HTML and return
+          setHighlightedCode(code.replace(/[&<>"']/g, (match) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+          }[match])));
+        }
       } catch (error) {
-        console.warn('Prism highlighting failed:', error);
-        setHighlightedCode(code);
+        console.warn('Prism highlighting failed for language:', language, error);
+        // Fallback to escaped plain text
+        setHighlightedCode(code.replace(/[&<>"']/g, (match) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[match])));
       }
     }
   }, [code, language]);
