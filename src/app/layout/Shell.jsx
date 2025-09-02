@@ -8,12 +8,14 @@ const Shell = () => {
   const { theme } = useTheme();
   
   return (
-    <div className={`${theme} flex h-screen bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 text-white`}>
+    <div className={`${theme} flex h-screen bg-gradient-to-br from-neutral-900 via-gray-900 to-zinc-900 text-white`}>
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gradient-to-br from-zinc-900/50 via-zinc-900/80 to-zinc-800/50">
-          <Outlet />
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gradient-to-br from-neutral-900/50 via-gray-900/80 to-zinc-800/50 p-6">
+          <div className="max-w-7xl mx-auto">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

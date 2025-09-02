@@ -709,6 +709,9 @@ export const getStats = () => {
   };
 };
 
+// Export demoStats as a computed value
+export const demoStats = getStats();
+
 export const demoPresence = [
   { id: 'user-1', name: 'You', avatarUrl: demoUsers[0].avatarUrl, colorHex: '#8B5CF6', cursor: { x: 0, y: 0 }, lastActiveAt: new Date().toISOString() },
   { id: 'user-2', name: 'Alice', avatarUrl: demoUsers[1].avatarUrl, colorHex: '#EC4899', cursor: { x: 0, y: 0 }, lastActiveAt: new Date().toISOString() },

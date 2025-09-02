@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Layout from '@/components/Layout';
+import Shell from '@/app/layout/Shell';
 import Dashboard from '@/pages/Dashboard';
 import CreatePaste from '@/pages/CreatePaste';
 import ViewDemo from '@/pages/ViewDemo';
@@ -12,7 +12,7 @@ import SignUp from '@/pages/auth/SignUp';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
+      <Route path="/" element={<Shell />}>
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="create" element={<CreatePaste />} />
