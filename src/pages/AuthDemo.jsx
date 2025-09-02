@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Shield, Mail, Lock, User, ArrowRight, GitHub, Google } from 'lucide-react'
 import { Box } from '../components/Box'
-import { cn } from '../lib/utils'
+import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 

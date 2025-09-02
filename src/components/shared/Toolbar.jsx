@@ -1,6 +1,6 @@
 import React from 'react';
 import { List, Grid, SortDesc, Filter, Search } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 import Box from '../Box';
 import Select from '../Select';
 

@@ -20,7 +20,10 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-64 bg-neutral-800 border-r border-neutral-700 flex flex-col">
+    <div 
+      className="w-64 bg-neutral-800 border-r border-neutral-700 flex flex-col"
+      style={{ width: '16rem', backgroundColor: '#1f2937', borderRight: '1px solid #374151', display: 'flex', flexDirection: 'column' }}
+    >
       <div className="p-6">
         <Link to="/dashboard" className="flex items-center gap-3 group">
           <div className="p-2 bg-transparent rounded-2xl group-hover:scale-105 transition-transform">

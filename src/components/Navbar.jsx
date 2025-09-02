@@ -6,7 +6,10 @@ import ThemeToggle from '@/components/ThemeToggle';
 
 const Navbar = () => {
   return (
-    <header className="bg-neutral-800 border-b border-neutral-700 px-6 py-4">
+    <header 
+      className="bg-neutral-800 border-b border-neutral-700 px-6 py-4"
+      style={{ backgroundColor: '#1f2937', borderBottom: '1px solid #374151', padding: '1rem 1.5rem' }}
+    >
       <div className="flex items-center justify-between">
         {/* Search */}
         <div className="flex-1 max-w-2xl">

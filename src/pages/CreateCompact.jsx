@@ -3,7 +3,7 @@ import { Settings, Save, Upload, Share2, Eye, EyeOff, Clock, Trash2, CheckCircle
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPaste, saveDraft } from '../lib/api';
 import { copyToClipboard, shortId } from '../lib/utils';
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 
 // Simple components inline for this demo
 const Button = ({ children, variant = 'primary', size = 'md', loading, disabled, className, ...props }) => {

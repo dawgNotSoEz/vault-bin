@@ -2,43 +2,119 @@ export const demoUsers = [
   {
     id: 'user-1',
     name: 'Nate',
+    username: 'codeMaster',
     email: 'nate@vaultbin.dev',
     avatarUrl: 'https://api.dicebear.com/7.x/notionists/svg?seed=Nate',
-    plan: 'free',
+    plan: 'pro',
     theme: 'dark',
     signedIn: true,
+    isOnline: true,
+    lastSeen: new Date(),
+    role: 'developer',
+    joinedAt: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000), // 6 months ago
   },
   {
     id: 'user-2',
     name: 'Alice',
+    username: 'designPro',
     email: 'alice@example.com',
     avatarUrl: 'https://api.dicebear.com/7.x/notionists/svg?seed=Alice',
     plan: 'free',
     signedIn: false,
+    isOnline: true,
+    lastSeen: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
+    role: 'designer',
+    joinedAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // 3 months ago
   },
   {
     id: 'user-3',
     name: 'Bob',
+    username: 'devOpsGuru',
     email: 'bob@example.com',
     avatarUrl: 'https://api.dicebear.com/7.x/notionists/svg?seed=Bob',
     plan: 'free',
     signedIn: false,
+    isOnline: false,
+    lastSeen: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    role: 'devops',
+    joinedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // 2 months ago
   },
   {
     id: 'user-4',
     name: 'Carol',
+    username: 'fullStackDev',
     email: 'carol@example.com',
     avatarUrl: 'https://api.dicebear.com/7.x/notionists/svg?seed=Carol',
-    plan: 'free',
+    plan: 'pro',
     signedIn: false,
+    isOnline: false,
+    lastSeen: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+    role: 'fullstack',
+    joinedAt: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000), // 4 months ago
   },
 ];
 
 export const demoFolders = [
-  { id: 'all', name: 'All Pastes', slug: 'all', count: 0 }, // Count will be dynamic
-  { id: 'work', name: 'Work', slug: 'work', count: 0 },
-  { id: 'personal', name: 'Personal', slug: 'personal', count: 0 },
-  { id: 'projects', name: 'Projects', slug: 'projects', count: 0 },
+  { 
+    id: 'all', 
+    name: 'All Pastes', 
+    slug: 'all', 
+    count: 0, 
+    description: 'All your pastes in one place',
+    color: '#6366F1',
+    isPrivate: false,
+    createdAt: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000)
+  },
+  { 
+    id: 'work', 
+    name: 'Work', 
+    slug: 'work', 
+    count: 0,
+    description: 'Professional code snippets and documentation',
+    color: '#8B5CF6',
+    isPrivate: false,
+    createdAt: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000)
+  },
+  { 
+    id: 'personal', 
+    name: 'Personal', 
+    slug: 'personal', 
+    count: 0,
+    description: 'Personal notes and code experiments',
+    color: '#10B981',
+    isPrivate: true,
+    createdAt: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000)
+  },
+  { 
+    id: 'projects', 
+    name: 'Projects', 
+    slug: 'projects', 
+    count: 0,
+    description: 'Code from various development projects',
+    color: '#F59E0B',
+    isPrivate: false,
+    createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+  },
+  {
+    id: 'snippets',
+    name: 'Code Snippets',
+    slug: 'snippets',
+    count: 0,
+    description: 'Reusable code snippets and utilities',
+    color: '#EF4444',
+    isPrivate: false,
+    createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000)
+  },
+  {
+    id: 'templates',
+    name: 'Templates',
+    slug: 'templates',
+    count: 0,
+    description: 'Boilerplate code and project templates',
+    color: '#3B82F6',
+    isPrivate: false,
+    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+  }
 ];
 
 export const demoPastes = [
@@ -589,12 +665,47 @@ export const getStats = () => {
   const publicPastes = demoPastes.filter(p => p.visibility === 'public').length;
   const privatePastes = demoPastes.filter(p => p.visibility === 'private').length;
   const totalViews = demoPastes.reduce((sum, p) => sum + p.views, 0);
+  const totalLikes = demoPastes.reduce((sum, p) => sum + p.reactionsCount, 0);
 
   return {
     totalPastes,
     public: publicPastes,
     private: privatePastes,
     totalViews,
+    totalLikes,
+    totalFolders: demoFolders.length - 1, // Exclude 'all' folder
+    weeklyGrowth: 12,
+    monthlyGrowth: 45,
+    recentActivity: [
+      {
+        id: 'activity-1',
+        type: 'paste_created',
+        title: 'React Authentication Hook',
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+        user: demoUsers[0]
+      },
+      {
+        id: 'activity-2',
+        type: 'paste_liked',
+        title: 'CSS Grid Dashboard Layout',
+        timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
+        user: demoUsers[1]
+      },
+      {
+        id: 'activity-3',
+        type: 'folder_created',
+        title: 'TypeScript Utils',
+        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
+        user: demoUsers[0]
+      },
+      {
+        id: 'activity-4',
+        type: 'collaboration',
+        title: 'Advanced TypeScript API Client',
+        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
+        user: demoUsers[1]
+      }
+    ]
   };
 };
 
@@ -606,6 +717,77 @@ export const demoPresence = [
 ];
 
 export const demoComments = [
-  { id: 'c1', pasteId: 'p_meeting_q4', authorId: 'user-2', lineStart: 5, lineEnd: 5, message: 'Great component structure! Consider adding error handling for the state updates.', createdAt: new Date(Date.now() - 60 * 1000 * 5).toISOString() },
-  { id: 'c2', pasteId: 'p_meeting_q4', authorId: 'user-1', lineStart: 10, lineEnd: 12, message: 'Should we add TypeScript interfaces for better type safety?', createdAt: new Date(Date.now() - 60 * 1000 * 2).toISOString() },
+  { 
+    id: 'c1', 
+    pasteId: 'p_meeting_q4', 
+    authorId: 'user-2', 
+    lineStart: 5, 
+    lineEnd: 5, 
+    message: 'Great component structure! Consider adding error handling for the state updates.', 
+    createdAt: new Date(Date.now() - 60 * 1000 * 5).toISOString(),
+    replies: [
+      {
+        id: 'c1-r1',
+        authorId: 'user-1',
+        message: 'Good point! I\'ll add try-catch blocks.',
+        createdAt: new Date(Date.now() - 60 * 1000 * 3).toISOString()
+      }
+    ]
+  },
+  { 
+    id: 'c2', 
+    pasteId: 'p_meeting_q4', 
+    authorId: 'user-1', 
+    lineStart: 10, 
+    lineEnd: 12, 
+    message: 'Should we add TypeScript interfaces for better type safety?', 
+    createdAt: new Date(Date.now() - 60 * 1000 * 2).toISOString(),
+    replies: []
+  },
+  {
+    id: 'c3',
+    pasteId: 'p_api_cfg',
+    authorId: 'user-3',
+    lineStart: 1,
+    lineEnd: 1,
+    message: 'Consider using environment variables for the API URL.',
+    createdAt: new Date(Date.now() - 60 * 1000 * 30).toISOString(),
+    replies: []
+  }
+];
+
+// Collaboration and presence data
+export const demoCollaborations = [
+  {
+    id: 'collab-1',
+    pasteId: 'p_api_cfg',
+    participants: [demoUsers[0], demoUsers[1]],
+    cursors: [
+      {
+        userId: demoUsers[1].id,
+        position: { line: 15, column: 23 },
+        selection: { start: { line: 15, column: 20 }, end: { line: 15, column: 30 } },
+        color: '#8B5CF6'
+      }
+    ],
+    isActive: true,
+    lastActivity: new Date(),
+    createdAt: new Date(Date.now() - 30 * 60 * 1000)
+  },
+  {
+    id: 'collab-2',
+    pasteId: 'p_meeting_q4',
+    participants: [demoUsers[0], demoUsers[2]],
+    cursors: [],
+    isActive: false,
+    lastActivity: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000)
+  }
+];
+
+// Language support for syntax highlighting
+export const demoLanguages = [
+  'plaintext', 'markdown', 'javascript', 'typescript', 'jsx', 'tsx',
+  'python', 'java', 'csharp', 'cpp', 'c', 'php', 'ruby', 'go',
+  'rust', 'sql', 'json', 'yaml', 'css', 'scss', 'bash', 'powershell', 'markup'
 ];

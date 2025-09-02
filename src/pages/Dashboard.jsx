@@ -1,32 +1,114 @@
 import React, { useState } from 'react';
 import { Plus, Grid, List, BarChart3, Clock, Folder, Globe, Lock } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { cn } from '@/lib/utils';
-import PasteCard from '@/components/PasteCard';
+import { demoPastes, demoStats } from '@/lib/demoData';
 
-// Dummy data
-const pastesData = [
-  { id: 1, title: 'Project Plan', lang: 'markdown', expires: '2d', folder: 'Work', visibility: 'private', views: 24, created: '2h ago' },
-  { id: 2, title: 'API Example', lang: 'python', expires: '1w', folder: 'Dev', visibility: 'public', views: 156, created: '5h ago' },
-  { id: 3, title: 'SQL Query', lang: 'sql', expires: '12h', folder: 'Snippets', visibility: 'unlisted', views: 8, created: '1d ago' },
-  { id: 4, title: 'React Component', lang: 'javascript', expires: '3d', folder: 'Frontend', visibility: 'public', views: 89, created: '2d ago' },
-  { id: 5, title: 'Docker Config', lang: 'yaml', expires: '1w', folder: 'DevOps', visibility: 'private', views: 12, created: '3d ago' },
-  { id: 6, title: 'Bash Script', lang: 'bash', expires: 'never', folder: 'Scripts', visibility: 'public', views: 234, created: '1w ago' },
-];
+// Simple PasteCard component to avoid import issues
+const PasteCard = ({ paste, viewMode }) => {
+  const getVisibilityIcon = (visibility) => {
+    switch (visibility) {
+      case 'public':
+        return Globe;
+      case 'private':
+        return Lock;
+      default:
+        return Globe;
+    }
+  };
 
-const statsData = [
-  { name: 'Mon', views: 120, pastes: 12 },
-  { name: 'Tue', views: 150, pastes: 18 },
-  { name: 'Wed', views: 180, pastes: 15 },
-  { name: 'Thu', views: 220, pastes: 22 },
-  { name: 'Fri', views: 190, pastes: 16 },
-  { name: 'Sat', views: 160, pastes: 14 },
-  { name: 'Sun', views: 140, pastes: 10 },
-];
+  const getLanguageColor = (lang) => {
+    const colors = {
+      javascript: 'bg-yellow-500',
+      typescript: 'bg-blue-500',
+      python: 'bg-green-500',
+      markdown: 'bg-gray-500',
+      sql: 'bg-orange-500',
+      yaml: 'bg-red-500',
+      bash: 'bg-green-600',
+      json: 'bg-purple-500',
+      css: 'bg-pink-500',
+      default: 'bg-indigo-500'
+    };
+    return colors[lang] || colors.default;
+  };
+
+  const VisibilityIcon = getVisibilityIcon(paste.visibility);
+
+  if (viewMode === 'list') {
+    return (
+      <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-4 hover:scale-[1.02] transition-all duration-200 shadow-lg">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4 flex-1">
+            <div className={cn('w-3 h-3 rounded-full', getLanguageColor(paste.language))} />
+            <div className="flex-1">
+              <h3 className="text-white font-semibold">{paste.title}</h3>
+              <div className="flex items-center gap-4 text-sm text-neutral-400 mt-1">
+                <span className="flex items-center gap-1">
+                  <Folder className="h-3 w-3" />
+                  {paste.folder || 'Uncategorized'}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {new Date(paste.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <VisibilityIcon className="h-4 w-4 text-neutral-400" />
+            <span className="text-sm text-neutral-400 bg-neutral-700 px-2 py-1 rounded-lg">
+              {paste.language}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6 hover:scale-[1.02] transition-all duration-200 shadow-lg">
+      <div className="flex items-start justify-between mb-4">
+        <div className={cn('w-4 h-4 rounded-full', getLanguageColor(paste.language))} />
+        <VisibilityIcon className="h-4 w-4 text-neutral-400" />
+      </div>
+
+      <h3 className="text-white font-semibold text-lg mb-2">{paste.title}</h3>
+      
+      <div className="space-y-2 text-sm text-neutral-400">
+        <div className="flex items-center gap-2">
+          <Folder className="h-3 w-3" />
+          <span>{paste.folder || 'Uncategorized'}</span>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Clock className="h-3 w-3" />
+          <span>Created {new Date(paste.createdAt).toLocaleDateString()}</span>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <span>{paste.views || 0} views</span>
+        </div>
+      </div>
+
+      <div className="mt-4 pt-4 border-t border-neutral-700 flex items-center justify-between">
+        <span className="text-sm text-neutral-400 bg-neutral-700 px-2 py-1 rounded-lg">
+          {paste.language}
+        </span>
+        <span className="text-xs text-neutral-500">
+          {paste.visibility}
+        </span>
+      </div>
+    </div>
+  );
+};
 
 const Dashboard = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [showStats, setShowStats] = useState(false);
+
+  // Use demo data
+  const pastes = demoPastes.slice(0, 6); // Show first 6 pastes
+  const stats = demoStats || {};
 
   return (
     <div className="space-y-6">
@@ -43,31 +125,21 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* Stats Panel */}
-      {showStats && (
-        <div className="bg-neutral-800 rounded-2xl p-6 shadow-lg border border-neutral-700">
-          <h3 className="text-lg font-semibold text-white mb-4">7-Day Analytics</h3>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={statsData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="name" stroke="#9ca3af" />
-                <YAxis stroke="#9ca3af" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1f2937', 
-                    border: '1px solid #374151',
-                    borderRadius: '12px',
-                    color: '#fff'
-                  }} 
-                />
-                <Line type="monotone" dataKey="views" stroke="#8b5cf6" strokeWidth={2} />
-                <Line type="monotone" dataKey="pastes" stroke="#06b6d4" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-2">Total Pastes</h3>
+          <p className="text-3xl font-bold text-purple-400">{stats.totalPastes || 0}</p>
         </div>
-      )}
+        <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-2">Total Views</h3>
+          <p className="text-3xl font-bold text-green-400">{stats.totalViews || 0}</p>
+        </div>
+        <div className="bg-neutral-800 border border-neutral-700 rounded-2xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-2">Total Folders</h3>
+          <p className="text-3xl font-bold text-blue-400">{stats.totalFolders || 0}</p>
+        </div>
+      </div>
 
       {/* Controls */}
       <div className="flex items-center justify-between bg-neutral-800 rounded-2xl p-4 shadow-lg border border-neutral-700">
@@ -109,7 +181,7 @@ const Dashboard = () => {
           )}
         >
           <BarChart3 className="h-4 w-4" />
-          {showStats ? 'Hide Stats' : 'Enable Stats'}
+          {showStats ? 'Hide Stats' : 'Show Stats'}
         </button>
       </div>
 
@@ -120,9 +192,18 @@ const Dashboard = () => {
           ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
           : 'space-y-4'
       )}>
-        {pastesData.map((paste) => (
-          <PasteCard key={paste.id} paste={paste} viewMode={viewMode} />
-        ))}
+        {pastes.length > 0 ? (
+          pastes.map((paste) => (
+            <PasteCard key={paste.id} paste={paste} viewMode={viewMode} />
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12">
+            <p className="text-neutral-400 text-lg">No pastes found</p>
+            <button className="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-2xl transition-colors">
+              Create your first paste
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

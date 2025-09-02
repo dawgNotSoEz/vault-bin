@@ -18,7 +18,7 @@ import 'prismjs/components/prism-rust';
 import 'prismjs/components/prism-sql';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-yaml';
-import 'prismjs/components/prism-xml';
+import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-css';
 import 'prismjs/components/prism-scss';
 import 'prismjs/components/prism-bash';
@@ -26,7 +26,7 @@ import 'prismjs/components/prism-powershell';
 import 'prismjs/components/prism-markdown';
 
 import { Copy, Check } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 
 const PrismHighlighter = ({
   code,
