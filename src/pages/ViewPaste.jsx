@@ -16,8 +16,10 @@ const ViewPaste = () => {
   const { toast: showToast } = useToast();
 
   const [paste, setPaste] = useState(null);
-  const [password, setPassword] = useState('');
   const [unlocked, setUnlocked] = useState(false);
+
+  // Local modal state (moved into component below)
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
     const foundPaste = getPasteById(id);
@@ -25,6 +27,8 @@ const ViewPaste = () => {
       setPaste(foundPaste);
       if (!foundPaste.passwordProtected) {
         setUnlocked(true);
+      } else {
+        setShowPasswordModal(true);
       }
     } else {
       navigate('/404');
@@ -43,18 +47,7 @@ const ViewPaste = () => {
     }
   }, [paste, unlocked, showToast, navigate]);
 
-  const handleUnlock = () => {
-    if (password === 'demo') { // Hardcoded password for demo
-      setUnlocked(true);
-      showToast('Paste unlocked!', 'success');
-      // Increment view count for demo
-      if (paste) {
-        updatePaste(paste.id, { views: paste.views + 1 });
-      }
-    } else {
-      showToast('Incorrect password.', 'error');
-    }
-  };
+  
 
   const handleCopy = async () => {
     if (paste?.content) {
@@ -113,27 +106,16 @@ const ViewPaste = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      {paste.passwordProtected && !unlocked ? (
-        <Box className="max-w-md mx-auto text-center p-8">
-          <Lock className="w-16 h-16 text-zinc-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Password Protected</h2>
-          <p className="text-zinc-400 mb-6">This paste is encrypted and requires a password to view.</p>
-          <Input
-            type="password"
-            placeholder="Enter password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyPress={(e) => { if (e.key === 'Enter') handleUnlock(); }}
-            className="mb-4"
-          />
-          <Button onClick={handleUnlock} className="w-full">Unlock Paste</Button>
-          <div className="flex items-center justify-center mt-4 text-sm text-zinc-500">
-            <Lock className="w-4 h-4 mr-2" />
-            End-to-end encrypted
-          </div>
-          <p className="text-xs text-zinc-600 mt-2">Paste ID: {paste.id}</p>
-        </Box>
-      ) : (
+      {/* Password modal shown when paste is protected */}
+      {paste.passwordProtected && showPasswordModal && (
+        <PasswordUnlockModal
+          pasteId={paste.id}
+          onClose={() => setShowPasswordModal(false)}
+          onSuccess={() => { setUnlocked(true); setShowPasswordModal(false); showToast('Paste unlocked!', 'success'); }}
+        />
+      )}
+
+  {(!paste.passwordProtected || unlocked) && (
         <>
           <Box className="mb-6">
             <Box.Header>
@@ -195,6 +177,55 @@ const ViewPaste = () => {
           </Box>
         </>
       )}
+    </div>
+  );
+};
+
+// Simple Password Unlock Modal component (local to this file)
+const PasswordUnlockModal = ({ pasteId, onClose, onSuccess }) => {
+  const { toast } = useToast();
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const validate = async (pw) => {
+    // Demo validation: any non-empty password that equals 'demo' will succeed.
+    return new Promise((resolve) => setTimeout(() => resolve(pw === 'demo'), 600));
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    const ok = await validate(password);
+    setLoading(false);
+    if (ok) {
+      onSuccess();
+    } else {
+      toast('Incorrect password.', { type: 'error' });
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6">
+      <div className="bg-zinc-900 border border-zinc-700/50 rounded-2xl p-8 max-w-md w-full">
+        <div className="text-center mb-4">
+          <Lock className="w-12 h-12 text-zinc-400 mx-auto mb-2" />
+          <h3 className="text-lg font-semibold text-white">This paste is password protected</h3>
+          <p className="text-zinc-400 text-sm">Enter the password to view the content.</p>
+        </div>
+
+        <Input
+          type="password"
+          placeholder="Enter password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onKeyPress={(e) => { if (e.key === 'Enter') handleSubmit(); }}
+          className="mb-4"
+        />
+
+        <div className="flex gap-2">
+          <Button onClick={handleSubmit} className="flex-1" disabled={loading}>{loading ? 'Checking...' : 'Unlock'}</Button>
+          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+        </div>
+      </div>
     </div>
   );
 };
