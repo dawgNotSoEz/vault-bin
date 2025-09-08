@@ -129,7 +129,15 @@ const SyntaxHighlighter = ({
 
   useEffect(() => {
     if (codeRef.current && prismLanguage !== 'plaintext') {
-      Prism.highlightElement(codeRef.current)
+      try {
+        Prism.highlightElement(codeRef.current)
+      } catch (err) {
+        // If Prism fails for any language (missing dependency, parsing error),
+        // avoid crashing the whole app. Log the error and continue rendering plain text.
+        // This keeps the UI resilient while we optionally lazy-load missing languages.
+        // eslint-disable-next-line no-console
+        console.warn('Prism highlight failed:', err)
+      }
     }
   }, [code, prismLanguage])
 
