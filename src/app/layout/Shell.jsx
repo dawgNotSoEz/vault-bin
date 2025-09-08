@@ -5,6 +5,7 @@ import Sidebar from '@/components/navigation/Sidebar';
 import AuthModal from '@/components/AuthModal';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
+import DemoBanner from '@/components/DemoBanner';
 
 const Shell = () => {
   const { theme } = useTheme();
@@ -30,6 +31,9 @@ const Shell = () => {
   return (
     <div className={`${theme} min-h-screen bg-gradient-to-br from-neutral-900 via-gray-900 to-zinc-900 text-white`}>
       <Navbar onOpenAuth={openAuthModal} />
+      <div className="max-w-7xl mx-auto px-6 mt-4">
+        <DemoBanner />
+      </div>
       <div className="flex">
         <Sidebar />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gradient-to-br from-neutral-900/50 via-gray-900/80 to-zinc-800/50 p-6">
