@@ -13,24 +13,20 @@ import {
   Bell
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 import { cn } from '@/lib/utils';
 
-const Navbar = () => {
+const Navbar = ({ onOpenAuth }) => {
   const location = useLocation();
+  const { user, isAuthenticated, signOut } = useAuth();
+  const { success } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const userMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
-
-  // Mock user state - replace with actual auth context
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const user = {
-    name: 'Alex Chen',
-    email: 'alex@vaultbin.dev',
-    avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Alex'
-  };
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', isActive: location.pathname === '/dashboard' || location.pathname === '/' },
@@ -57,13 +53,13 @@ const Navbar = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     console.log('Searching for:', searchQuery);
-    // Handle search logic here
+    // TODO: connect backend here - implement search functionality
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    await signOut();
+    success('You have been signed out successfully');
     setIsUserMenuOpen(false);
-    // Handle logout logic
   };
 
   return (
@@ -164,14 +160,14 @@ const Navbar = () => {
               </button>
 
               {/* User Menu or Auth Buttons */}
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     className="flex items-center space-x-2 p-1.5 rounded-full hover:bg-neutral-800/60 transition-all duration-300 group"
                   >
                     <img
-                      src={user.avatar}
+                      src={user.avatarUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.name}`}
                       alt={user.name}
                       className="w-8 h-8 rounded-full border-2 border-transparent group-hover:border-purple-400/50 transition-all duration-300"
                     />
@@ -183,10 +179,14 @@ const Navbar = () => {
 
                   {/* User Dropdown */}
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-neutral-800/95 backdrop-blur-xl border border-neutral-700/50 rounded-2xl shadow-2xl py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute right-0 mt-2 w-64 bg-neutral-800/95 backdrop-blur-xl border border-neutral-700/50 rounded-2xl shadow-2xl py-2 animate-fade-in">
                       <div className="px-4 py-3 border-b border-neutral-700/50">
                         <div className="flex items-center space-x-3">
-                          <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full" />
+                          <img 
+                            src={user.avatarUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${user.name}`} 
+                            alt={user.name} 
+                            className="w-10 h-10 rounded-full" 
+                          />
                           <div>
                             <p className="text-sm font-medium text-white">{user.name}</p>
                             <p className="text-xs text-neutral-400">{user.email}</p>
@@ -195,11 +195,19 @@ const Navbar = () => {
                       </div>
                       
                       <div className="py-1">
-                        <Link to="/profile" className="flex items-center px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-neutral-700/50 transition-colors">
+                        <Link 
+                          to="/settings" 
+                          className="flex items-center px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-neutral-700/50 transition-colors"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
                           <UserCircle className="h-4 w-4 mr-3" />
                           Profile
                         </Link>
-                        <Link to="/settings" className="flex items-center px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-neutral-700/50 transition-colors">
+                        <Link 
+                          to="/settings" 
+                          className="flex items-center px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-neutral-700/50 transition-colors"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
                           <Settings className="h-4 w-4 mr-3" />
                           Settings
                         </Link>
@@ -216,18 +224,18 @@ const Navbar = () => {
                 </div>
               ) : (
                 <div className="flex items-center space-x-3">
-                  <Link
-                    to="/auth/signin"
+                  <button
+                    onClick={() => onOpenAuth('signin')}
                     className="px-4 py-2 text-sm font-medium text-neutral-300 hover:text-white transition-colors"
                   >
                     Sign In
-                  </Link>
-                  <Link
-                    to="/auth/signup"
+                  </button>
+                  <button
+                    onClick={() => onOpenAuth('signup')}
                     className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-sm font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg shadow-purple-600/25"
                   >
                     Sign Up
-                  </Link>
+                  </button>
                 </div>
               )}
 
@@ -247,7 +255,7 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div 
           ref={mobileMenuRef}
-          className="fixed top-16 left-0 right-0 z-40 lg:hidden bg-neutral-900/95 backdrop-blur-xl border-b border-neutral-700/50 animate-in slide-in-from-top duration-300"
+          className="fixed top-16 left-0 right-0 z-40 lg:hidden bg-neutral-900/95 backdrop-blur-xl border-b border-neutral-700/50 animate-slide-in-from-top"
         >
           <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
             
@@ -283,6 +291,30 @@ const Navbar = () => {
                 </Link>
               ))}
             </nav>
+
+            {/* Mobile Auth/User Section */}
+            {!isAuthenticated && (
+              <div className="flex space-x-3 pt-4 border-t border-neutral-700/50">
+                <button
+                  onClick={() => {
+                    onOpenAuth('signin');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-neutral-300 hover:text-white border border-neutral-600 rounded-lg hover:bg-neutral-800/60 transition-colors"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => {
+                    onOpenAuth('signup');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm font-medium rounded-lg transition-all duration-300"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
 
             {/* Mobile Theme Toggle */}
             <div className="flex items-center justify-between pt-4 border-t border-neutral-700/50">
