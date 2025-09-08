@@ -11,6 +11,7 @@ import SignUp from '@/pages/auth/SignUp';
 import NotFound from '@/pages/NotFound';
 import ViewPaste from '@/pages/ViewPaste';
 import Folders from '@/pages/Folders';
+import LoadingDemo from '@/pages/LoadingDemo';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="create" element={<Create />} />
+  <Route path="loading-demo" element={<LoadingDemo />} />
         <Route path="view-demo" element={<ViewDemo />} />
         <Route path="collaborate/:id" element={<Collaborate />} />
         <Route path="p/:id" element={<ViewPaste />} />
