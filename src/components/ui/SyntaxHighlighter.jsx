@@ -19,6 +19,8 @@ import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-json'
 import 'prismjs/components/prism-yaml'
 import 'prismjs/components/prism-markup'
+// Required for templating support used by some languages (php, twig, etc.)
+import 'prismjs/components/prism-markup-templating'
 import 'prismjs/components/prism-css'
 import 'prismjs/components/prism-scss'
 import 'prismjs/components/prism-bash'
